@@ -1,230 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Debate Topic Learner</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #FFDAB9, #FFE5B4);
-    color: #111;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  .embed-container {
-    width: 410px;
-    height: 410px;
-    background: #fff7f0;
-    border: 4px solid #FFB347;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 2px 4px 24px rgba(255, 179, 71, 0.1);
-  }
-  .weekly-topic {
-    background: #FFB347;
-    padding: 16px 10px 16px 10px;
-    font-size: 1.25em;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 2px solid #FFDAB9;
-    letter-spacing: 1.2px;
-  }
-  .scrollable-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: #FFB347 #fff7f0;
-  }
-  .daily-title {
-    font-size: 1.15em;
-    font-weight: bold;
-    margin-bottom: 8px;
-    letter-spacing: .5px;
-  }
-  .explanation {
-    margin-bottom: 14px;
-    background: #ffe5b4;
-    border-radius: 6px;
-    padding: 9px 11px;
-    font-size: 1em;
-    color: #222;
-    line-height: 1.5;
-  }
-  .section-title {
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 4px;
-    color: #EA7B00;
-    font-size: 0.98em;
-    letter-spacing: .5px;
-  }
-  .examples, .argue, .related {
-    margin-bottom: 10px;
-  }
-  .examples ul, .argue ul, .related ul {
-    margin: 0 0 0 20px;
-    padding: 0;
-    font-size: .98em;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Debate Topic Learner</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; line-height: 1.6; background: #f8f9fa; }
+    h1, h2 { color: #2a4d69; }
+    .section { background: #fff; border-radius: 6px; box-shadow: 0 2px 8px #ccc; padding: 1.5em; margin-bottom: 2em; }
+    .scenario { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 1em; margin: 1em 0; }
+    .example { background: #fffde7; border-left: 4px solid #fbc02d; padding: 1em; margin: 1em 0; }
+    .question { background: #e8f5e9; border-left: 4px solid #43a047; padding: 1em; margin: 1em 0; font-weight: bold;}
+    #reload { background: #1976d2; color: #fff; border: none; padding: 0.5em 1em; border-radius: 4px; cursor: pointer; }
+    #reload:hover { background: #125399;}
+  </style>
 </head>
 <body>
+  <h1 id="topic-title"></h1>
 
-<div class="embed-container">
-  <div class="weekly-topic" id="weekly-topic">Loading Weekly Topic...</div>
-  <div class="scrollable-content" id="daily-scroll">
-    Loading Daily Topic...
+  <div class="section">
+    <h2>Definition</h2>
+    <p id="definition"></p>
   </div>
-</div>
 
-<script>
-  // --- DATA BANK ---
-  const topicAreas = {
-    "Ethics": [
-      "Kantian Ethics", "Utilitarianism", "Virtue Ethics", "Moral Relativism"
-    ],
-    "International Relations": [
-      "Realism", "Liberalism", "Constructivism", "Neorealism"
-    ],
-    "Economics": [
-      "Keynesian Theory", "Monetarism", "Supply-Side Economics", "Behavioral Economics"
-    ],
-    "Environmental Policy": [
-      "Carbon Tax", "Cap and Trade", "Renewable Energy", "Geoengineering"
-    ],
-    "Technology": [
-      "Artificial Intelligence", "Data Privacy", "Cryptocurrency", "Social Media Regulation"
-    ],
-    "Justice": [
-      "Restorative Justice", "Retributive Justice", "Procedural Justice", "Distributive Justice"
-    ]
-  };
+  <div class="section">
+    <h2>Explanation</h2>
+    <p id="explanation"></p>
+  </div>
 
-  const topicData = {
-    // ... (same as before, only some topics shown here for brevity) ...
-    "Kantian Ethics": {
-      explanation: "Kantian Ethics is a theory of morality developed by philosopher Immanuel Kant. It says that what makes an action right or wrong isn't about the results—it’s about whether the action itself follows a rule that everyone could follow, all the time. Kant believed that you should act out of duty, not just because you want something good to happen. For example, if you think lying is wrong, you shouldn't lie, even if it might help someone, because you wouldn't want everyone to lie all the time. Kant’s main idea is that people have dignity and should always be treated as valuable in themselves, not just as a way to get what you want. Imagine returning a lost wallet even if no one would ever know; that’s Kantian Ethics in action.",
-      examples: [
-        "If you promise to return a borrowed book, you must do it—even if it’s hard for you.",
-        "If lying is wrong, it's always wrong—even to protect a friend."
-      ],
-      argue: [
-        "Promotes consistency and fairness in morality.",
-        "Can lead to tough situations—sometimes telling the truth can hurt someone."
-      ],
-      related: [
-        "Deontological Ethics",
-        "Categorical Imperative",
-        "Moral Absolutism"
-      ]
+  <div class="section">
+    <h2>Made-Up Scenario</h2>
+    <div class="scenario" id="scenario"></div>
+  </div>
+
+  <div class="section">
+    <h2>Real-World Example</h2>
+    <div class="example" id="example"></div>
+  </div>
+
+  <div class="section">
+    <h2>Critical Thinking Question</h2>
+    <div class="question" id="question"></div>
+    <button id="reload">New Topic</button>
+  </div>
+
+  <script>
+    // Topics are grouped by weekly area, each area contains 7 topics
+    const topics = [
+      // --- DISTRIBUTIVE JUSTICE & JUSTICE-RELATED TOPICS ---
+      {
+        title: "Distributive Justice",
+        definition: "Distributive justice is about how resources, rights, and responsibilities should be fairly shared among members of a society.",
+        explanation: "This principle deals with making sure everyone gets a fair share, but what 'fair' means can depend on need, equality, or merit. In debate, distributive justice is often used to argue for or against policies like welfare, taxation, or affirmative action.",
+        scenario: "A teacher has 10 extra pencils and must decide whether to give them equally to all students, only to those who forgot theirs, or to students who helped clean the classroom. Each approach uses a different idea of distributive justice.",
+        example: "Debates about universal healthcare often focus on distributive justice—should everyone receive care regardless of income, or only those who can pay?"
+      },
+      {
+        title: "Procedural Justice",
+        definition: "Procedural justice focuses on the fairness of the processes and methods used to make decisions, rather than the outcomes themselves.",
+        explanation: "Debaters use this concept to argue that as long as rules and procedures are fair and applied equally, the outcome is just, even if some people are unhappy with the result.",
+        scenario: "A school holds a fair election for class president. Even if the losing side is disappointed, procedural justice means the process was fair.",
+        example: "Court systems that guarantee a fair trial for all, no matter the verdict, are examples of procedural justice."
+      },
+      {
+        title: "Retributive Justice",
+        definition: "Retributive justice is the idea that wrongdoers deserve to be punished in proportion to their crimes.",
+        explanation: "In debate, this concept is used to support punishment as a way to balance the scales of justice, rather than focusing on rehabilitation or forgiveness.",
+        scenario: "If someone cheats in a game, the group decides that player must sit out the next round as a fair consequence.",
+        example: "The criminal justice system's use of prison sentences for crimes is based on retributive justice."
+      },
+      {
+        title: "Restorative Justice",
+        definition: "Restorative justice seeks to repair harm caused by wrongdoing through reconciliation between the victim, offender, and community.",
+        explanation: "This approach prioritizes healing and making amends, rather than just punishing the wrongdoer.",
+        scenario: "A student who broke a window apologizes, pays for repairs, and does community service to restore trust.",
+        example: "Some schools use restorative circles to address bullying, focusing on dialogue and agreement instead of suspension."
+      },
+      {
+        title: "Justice as Fairness (Rawlsian Justice)",
+        definition: "Justice as fairness, proposed by John Rawls, argues that a just society is one in which the least advantaged are as well off as possible, and everyone has equal basic liberties.",
+        explanation: "Rawls suggests we should design society as if we did not know our own position in it, to ensure fairness.",
+        scenario: "Students are told to divide a cake without knowing which piece they'll get, encouraging them to split it fairly.",
+        example: "Progressive tax systems, where the wealthy pay more, are often justified using Rawlsian justice."
+      },
+      {
+        title: "Egalitarianism",
+        definition: "Egalitarianism is the belief that all people should be treated as equals and have the same political, economic, social, and civil rights.",
+        explanation: "Debaters invoke egalitarianism to argue against discrimination and for equal treatment under the law or in policy.",
+        scenario: "A company implements blind hiring to ensure everyone has an equal chance, regardless of background.",
+        example: "Laws requiring equal pay for equal work are based on egalitarian principles."
+      },
+      {
+        title: "Desert-Based Justice",
+        definition: "Desert-based justice is the idea that people should receive outcomes based on what they deserve, due to their actions or character.",
+        explanation: "This concept supports rewarding hard work or punishing wrongdoing, emphasizing merit or responsibility.",
+        scenario: "A student who studies hardest gets the top grade, while one who cheats receives a failing mark.",
+        example: "Merit-based scholarships are a real-world example of desert-based justice."
+      },
+
+      // --- UTILITARIANISM & CONSEQUENTIALISM TOPICS ---
+      {
+        title: "Utilitarianism",
+        definition: "Utilitarianism is the theory that the best action is the one that maximizes overall happiness or well-being.",
+        explanation: "Debaters use utilitarianism to argue for policies that benefit the most people, even if some individuals are worse off. Opponents may point out that it can sometimes justify unfairness to minorities.",
+        scenario: "A city decides to close a noisy park at night to help thousands of residents sleep better, even though it upsets a few late-night visitors.",
+        example: "During emergencies, governments may ration resources like food and medicine to save the most lives, applying utilitarian logic."
+      },
+      {
+        title: "Rule Utilitarianism",
+        definition: "Rule utilitarianism holds that the best moral rules are those that, if always followed, would lead to the greatest good for the greatest number.",
+        explanation: "Instead of judging each action individually, debaters using rule utilitarianism argue for general rules (like honesty or nonviolence) that, on balance, maximize well-being.",
+        scenario: "Even if lying would help in one case, rule utilitarians support truth-telling because a general rule against lying is better for society.",
+        example: "Laws against theft are supported by rule utilitarianism, as following this rule benefits everyone overall."
+      },
+      {
+        title: "Act Utilitarianism",
+        definition: "Act utilitarianism says each action should be evaluated on whether it produces the greatest happiness in that specific instance.",
+        explanation: "Debaters might use act utilitarianism to justify exceptions to rules if breaking them leads to better outcomes.",
+        scenario: "A doctor lies to a patient to spare them distress, arguing it produces more happiness in that moment.",
+        example: "Deciding to run a red light late at night when no one is around, if it avoids harm and saves time, is an act utilitarian decision."
+      },
+      {
+        title: "Negative Utilitarianism",
+        definition: "Negative utilitarianism focuses on minimizing suffering rather than maximizing happiness.",
+        explanation: "This approach is used in debates to prioritize policies that prevent harm or reduce pain, even if they don't bring maximum happiness.",
+        scenario: "A government invests in disaster prevention to avoid suffering, even if it doesn’t make people happier day-to-day.",
+        example: "Public health campaigns to prevent disease outbreaks are an example of negative utilitarian priorities."
+      },
+      {
+        title: "Preference Utilitarianism",
+        definition: "Preference utilitarianism argues that actions should satisfy as many individual preferences as possible, rather than just maximize happiness.",
+        explanation: "In debate, this allows for more subjective measures of well-being, respecting personal choices and values.",
+        scenario: "A city designs public spaces after surveying residents about their preferences, not just what experts think is 'best.'",
+        example: "Allowing people to choose their work hours is based on preference utilitarianism."
+      },
+      {
+        title: "Total vs. Average Utilitarianism",
+        definition: "Total utilitarianism seeks to maximize the sum total of happiness, while average utilitarianism maximizes the happiness per person.",
+        explanation: "Debaters can use this distinction to argue about policies like population control or resource allocation.",
+        scenario: "A country considers whether to support a larger population with lower average happiness or a smaller, happier one.",
+        example: "Environmental debates about sustainability often involve total vs. average utilitarian thinking."
+      },
+      {
+        title: "Cost-Benefit Analysis",
+        definition: "Cost-benefit analysis is a decision-making approach that weighs the total expected costs against the benefits of an action or policy.",
+        explanation: "Used in debate to argue for or against policies by comparing potential harm and gains in concrete, often economic, terms.",
+        scenario: "A school considers building a new gym: the cost is high, but the benefit is improved student health and morale.",
+        example: "Government agencies use cost-benefit analyses to decide which infrastructure projects to fund."
+      },
+
+      // --- SOCIAL CONTRACT THEORY & POLITICAL PHILOSOPHY TOPICS ---
+      {
+        title: "Social Contract Theory",
+        definition: "Social contract theory holds that people agree to form societies and governments, giving up some freedoms in exchange for protection and order.",
+        explanation: "Debaters use this theory to justify authority, laws, and rights. When the government breaks the contract (e.g., by violating rights), citizens may be justified in resisting.",
+        scenario: "A group of friends agree to follow certain rules on a camping trip, like sharing food and chores, for everyone's benefit.",
+        example: "The U.S. Constitution is based on a social contract: citizens obey laws, and the government protects their rights."
+      },
+      {
+        title: "Hobbesian Social Contract",
+        definition: "The Hobbesian social contract theory proposes that people give up nearly all their rights to a sovereign in exchange for security and order.",
+        explanation: "In debate, Hobbes is used to defend strong governments and strict laws as necessary to prevent chaos.",
+        scenario: "A class chooses a strict leader to keep order after repeated disruptions.",
+        example: "Some authoritarian regimes justify their power as necessary to prevent civil unrest, echoing Hobbesian logic."
+      },
+      {
+        title: "Lockean Social Contract",
+        definition: "Locke’s social contract theory holds that people form governments to protect their natural rights—life, liberty, and property—and can overthrow rulers who violate these rights.",
+        explanation: "Debaters use Locke to argue for limited government and the right to revolution.",
+        scenario: "A club votes out a president who misuses funds, asserting their right to self-governance.",
+        example: "The American Revolution was inspired by Lockean social contract ideas."
+      },
+      {
+        title: "Rousseau’s Social Contract",
+        definition: "Rousseau argued that the social contract should reflect the general will of the people, prioritizing collective freedom and participation.",
+        explanation: "Debaters use Rousseau to support democracy and policies that reflect the people’s true interests.",
+        scenario: "A community votes on every major issue, rather than letting leaders decide alone.",
+        example: "Direct democracy movements are influenced by Rousseau’s ideas."
+      },
+      {
+        title: "Tacit Consent",
+        definition: "Tacit consent is the idea that by living in a society and enjoying its benefits, people implicitly agree to its rules, even if they never explicitly signed a contract.",
+        explanation: "Debaters may use tacit consent to argue that citizens must obey laws or pay taxes, even if they never voted for them.",
+        scenario: "A student who uses school facilities follows school rules, even if they never agreed in writing.",
+        example: "Arguments about paying taxes often invoke tacit consent."
+      },
+      {
+        title: "Civil Disobedience",
+        definition: "Civil disobedience is the refusal to obey unjust laws as a form of protest, usually in a nonviolent way.",
+        explanation: "Debaters discuss whether breaking the law can be justified if the law is immoral or oppressive.",
+        scenario: "Students stage a peaceful protest by refusing to follow a dress code they believe is unfair.",
+        example: "Martin Luther King Jr.'s protests against segregation used civil disobedience."
+      },
+      {
+        title: "Legitimacy of Government",
+        definition: "Legitimacy refers to the right of a government to rule, based on the consent of the governed and respect for justice.",
+        explanation: "Debaters argue if a government loses legitimacy through corruption or rights violations, its authority is no longer valid.",
+        scenario: "A student council is ignored after repeatedly breaking its own rules; students create a new council.",
+        example: "Revolutions often occur when people believe their government is no longer legitimate."
+      },
+
+      // --- SPEECH, RIGHTS, & LIBERTY TOPICS ---
+      {
+        title: "Freedom of Speech",
+        definition: "Freedom of speech is the right to express opinions and ideas without government restraint, except in limited cases.",
+        explanation: "Debaters discuss whether this right should be absolute or if there should be limits (like hate speech, threats, or misinformation).",
+        scenario: "A student newspaper wants to publish a controversial article. Should the school allow it, even if it offends some students?",
+        example: "Debates over social media bans and censorship often focus on how far freedom of speech should go."
+      },
+      {
+        title: "Freedom of Religion",
+        definition: "Freedom of religion is the right to practice, or not practice, any faith without government interference.",
+        explanation: "Debaters discuss the limits of religious freedom, especially when practices conflict with other laws or rights.",
+        scenario: "A student asks to be excused from class for a religious holiday. Should the school grant this?",
+        example: "Debates over wearing religious symbols in public spaces involve freedom of religion."
+      },
+      {
+        title: "Right to Privacy",
+        definition: "The right to privacy protects individuals from unwarranted intrusion into their personal lives by the government or others.",
+        explanation: "Debaters argue about surveillance, data collection, and the balance between security and privacy.",
+        scenario: "A school installs cameras in all classrooms. Are students’ privacy rights being violated?",
+        example: "Government phone surveillance programs are often debated regarding privacy rights."
+      },
+      {
+        title: "Right to Assemble",
+        definition: "The right to assemble allows people to gather peacefully for protests, meetings, and other purposes.",
+        explanation: "Debaters discuss when this right can be limited, such as for public safety or order.",
+        scenario: "Students organize a peaceful protest in the cafeteria. Should the school allow it?",
+        example: "Restrictions on demonstrations or rallies often raise questions about assembly rights."
+      },
+      {
+        title: "Freedom of the Press",
+        definition: "Freedom of the press protects the right of journalists and media organizations to report news without censorship or punishment.",
+        explanation: "Debaters discuss how this right balances with national security, privacy, or misinformation concerns.",
+        scenario: "A school newspaper uncovers a scandal and wants to publish the story. Should the administration interfere?",
+        example: "Governments restricting journalists during wartime often sparks debate about press freedom."
+      },
+      {
+        title: "Hate Speech vs. Free Speech",
+        definition: "Hate speech is language that attacks or demeans a group based on identity, while free speech protects expression. Debates center on if and when hate speech should be limited.",
+        explanation: "Debaters explore where to draw the line between protecting free expression and preventing harm.",
+        scenario: "A speaker uses offensive language at a debate club event. Should the club set rules or allow all speech?",
+        example: "Laws banning hate speech are controversial in countries with strong free speech traditions."
+      },
+      {
+        title: "Right to Protest",
+        definition: "The right to protest allows people to publicly express disagreement with policies, leaders, or events.",
+        explanation: "Debaters discuss limits on protests, such as location, time, or methods, and the importance of this right in a democracy.",
+        scenario: "Students walk out of class to protest a new school policy. Should they be punished or protected?",
+        example: "Movements like climate strikes or civil rights marches test the boundaries of protest rights."
+      },
+
+      // --- REPARATIONS, HISTORICAL JUSTICE, & RESTITUTION TOPICS ---
+      {
+        title: "Reparations",
+        definition: "Reparations are compensation given for past injustices or harm, often discussed regarding historic wrongs like slavery or colonialism.",
+        explanation: "In debates, reparations are argued as a way to address long-term inequality, while opponents may claim they are unfair to people who did not directly cause harm.",
+        scenario: "A college considers giving scholarships to descendants of a group once excluded from attending, as a form of reparations.",
+        example: "Some countries have paid reparations to communities harmed by past government actions, sparking debate about fairness and responsibility."
+      },
+      {
+        title: "Affirmative Action",
+        definition: "Affirmative action refers to policies that give preferences to historically disadvantaged groups to promote equality.",
+        explanation: "Debaters argue whether these policies are necessary to correct past injustice or whether they create new unfairness.",
+        scenario: "A university reserves some spots for minority applicants to increase diversity.",
+        example: "Court cases about college admissions in the U.S. often center on affirmative action."
+      },
+      {
+        title: "Historical Apologies",
+        definition: "Historical apologies are formal statements acknowledging and expressing regret for past wrongs committed by governments or institutions.",
+        explanation: "Debaters discuss whether apologies are meaningful or enough to address harm, and whether they should be accompanied by other actions.",
+        scenario: "A school apologizes for past discrimination against certain students but offers no compensation.",
+        example: "Countries have issued apologies for colonization or forced assimilation policies."
+      },
+      {
+        title: "Restitution",
+        definition: "Restitution is the act of returning or compensating for property or rights taken unjustly.",
+        explanation: "Debaters discuss if and how restitution should be made for historical or recent injustices.",
+        scenario: "A city returns land to a family whose ancestors had it seized unfairly decades ago.",
+        example: "Legal settlements for stolen art or land involve restitution."
+      },
+      {
+        title: "Transitional Justice",
+        definition: "Transitional justice refers to measures taken to address past human rights abuses after major political changes, like regime changes or civil wars.",
+        explanation: "Debaters discuss which approaches—trials, truth commissions, reparations—are just and effective.",
+        scenario: "A new government investigates crimes committed by the old regime and compensates victims.",
+        example: "South Africa’s Truth and Reconciliation Commission is a famous example of transitional justice."
+      },
+      {
+        title: "Collective Responsibility",
+        definition: "Collective responsibility is the idea that groups, not just individuals, can owe compensation or blame for past wrongs.",
+        explanation: "Debaters discuss whether current generations should be responsible for the actions of their ancestors or group members.",
+        scenario: "A club apologizes for a culture of bullying that existed before current members joined.",
+        example: "Debates about reparations for slavery often involve collective responsibility."
+      },
+      {
+        title: "Reconciliation",
+        definition: "Reconciliation involves building trust and understanding between groups after conflict or injustice, often alongside or instead of material compensation.",
+        explanation: "Debaters discuss whether reconciliation can happen without reparations, or if both are needed for justice.",
+        scenario: "Two rival school clubs hold joint events to heal after years of conflict.",
+        example: "Post-conflict societies like Rwanda have pursued reconciliation programs to prevent future violence."
+      },
+
+      // --- ETHICS, VALUES, & MORALITY TOPICS ---
+      {
+        title: "Moral Relativism",
+        definition: "Moral relativism is the belief that what is right or wrong depends on individual or cultural viewpoints, not universal standards.",
+        explanation: "Debaters use this idea to challenge claims that certain actions are always good or bad, pointing out differences in customs and beliefs.",
+        scenario: "One country considers eating certain animals normal, while another finds it taboo. Is either side 'wrong'?",
+        example: "International debates on human rights often raise questions about moral relativism versus universal values."
+      },
+      {
+        title: "Deontology",
+        definition: "Deontology is the ethical theory that actions are right or wrong based on rules or duties, regardless of consequences.",
+        explanation: "Debaters use deontology to argue for absolute moral rules (like 'never lie'), even if breaking them would have good outcomes.",
+        scenario: "A student refuses to cheat on a test, even though it would help their grade, because it’s against the rules.",
+        example: "Debates about torture often pit deontological principles against utilitarian arguments."
+      },
+      {
+        title: "Virtue Ethics",
+        definition: "Virtue ethics focuses on developing good character traits (virtues) like honesty and courage, rather than on rules or consequences.",
+        explanation: "Debaters use virtue ethics to argue that the best actions are those that build moral character.",
+        scenario: "A student admits a mistake and apologizes, prioritizing honesty over self-protection.",
+        example: "Leaders are often judged by their virtues or lack thereof in political debates."
+      },
+      {
+        title: "Ethical Egoism",
+        definition: "Ethical egoism is the view that individuals should act in their own self-interest.",
+        explanation: "Debaters use egoism to justify pursuing one's own goals, but critics argue it can undermine cooperation and fairness.",
+        scenario: "A student refuses to share notes, believing it’s not in their self-interest.",
+        example: "Business leaders may be accused of egoism if they put profits before ethics."
+      },
+      {
+        title: "Care Ethics",
+        definition: "Care ethics emphasizes the importance of relationships, empathy, and caring for others in moral decision-making.",
+        explanation: "Debaters use care ethics to argue that policies should take into account people's needs and emotional bonds.",
+        scenario: "A teacher gives extra help to a struggling student, focusing on care over strict rules.",
+        example: "Healthcare debates often involve care ethics when discussing patient needs."
+      },
+      {
+        title: "Moral Absolutism",
+        definition: "Moral absolutism is the belief that certain actions are always right or wrong, no matter the context or consequences.",
+        explanation: "Debaters use absolutism to argue for or against strict moral rules.",
+        scenario: "A student refuses to steal, even to help a friend, believing stealing is always wrong.",
+        example: "Debates over issues like torture or capital punishment often invoke moral absolutism."
+      },
+      {
+        title: "Moral Dilemmas",
+        definition: "A moral dilemma is a situation where all available options lead to a moral problem and there is no clear right answer.",
+        explanation: "Debaters use dilemmas to explore the complexities of ethical decision-making.",
+        scenario: "A lifeboat can only carry five people, but there are six survivors. Who should be left behind?",
+        example: "Famous thought experiments like the trolley problem illustrate moral dilemmas."
+      }
+    ];
+
+    // Random topic selection
+    function getRandomTopic() {
+      return topics[Math.floor(Math.random() * topics.length)];
     }
-    // ...add others as before...
-  };
 
-  // --- RANDOMIZATION & NON-REPEATING LOGIC ---
-  function shuffleArray(arr) {
-    let a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    // Fresh, generated-style question
+    function generateQuestion(topic) {
+      const questionTemplates = [
+        `How might arguments about "${topic.title}" change if the society's values were different?`,
+        `What possible unintended consequences could result from prioritizing "${topic.title}" in policymaking?`,
+        `How would you defend or criticize "${topic.title}" if you were on the opposite side of the debate?`,
+        `Can you think of a case where "${topic.title}" might conflict with another important principle? What should take priority?`,
+        `If you were a judge, how would you apply "${topic.title}" to a completely new issue not discussed above?`,
+        `How might opponents of "${topic.title}" argue their case, and how could you respond?`,
+        `Would "${topic.title}" always lead to fairness, or are there exceptions? Give an example.`,
+        `How does "${topic.title}" affect individuals differently than groups?`,
+        `What would happen if society completely ignored "${topic.title}"?`,
+        `How might new technology challenge or reinforce the ideas of "${topic.title}"?`
+      ];
+      const idx = Math.floor(Math.random() * questionTemplates.length);
+      return questionTemplates[idx];
     }
-    return a;
-  }
 
-  let year = new Date().getFullYear();
-  let storageKey = `debate-weekly-shuffle-${year}`;
-  let weeklyOrder = JSON.parse(localStorage.getItem(storageKey));
+    // Render topic and question
+    function renderTopic() {
+      const topic = getRandomTopic();
+      document.getElementById('topic-title').textContent = topic.title;
+      document.getElementById('definition').textContent = topic.definition;
+      document.getElementById('explanation').textContent = topic.explanation;
+      document.getElementById('scenario').textContent = topic.scenario;
+      document.getElementById('example').textContent = topic.example;
+      document.getElementById('question').textContent = generateQuestion(topic);
+    }
 
-  if (!weeklyOrder || weeklyOrder.length !== Object.keys(topicAreas).length) {
-    weeklyOrder = shuffleArray(Object.keys(topicAreas));
-    localStorage.setItem(storageKey, JSON.stringify(weeklyOrder));
-  }
+    document.getElementById('reload').onclick = renderTopic;
 
-  function getWeekNumber(d) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-  }
-
-  const today = new Date();
-  const weekNum = getWeekNumber(today);
-  const areaIndex = (weekNum - 1) % weeklyOrder.length;
-  const weeklyTopic = weeklyOrder[areaIndex];
-
-  let topicsList = topicAreas[weeklyTopic];
-  let dailyShuffleKey = `debate-daily-shuffle-${year}-${areaIndex}`;
-  let dailyOrder = JSON.parse(localStorage.getItem(dailyShuffleKey));
-  if (!dailyOrder || dailyOrder.length !== topicsList.length) {
-    dailyOrder = shuffleArray(topicsList);
-    localStorage.setItem(dailyShuffleKey, JSON.stringify(dailyOrder));
-  }
-  const topicIndex = ((today.getDate() + weekNum) % dailyOrder.length);
-  const dailyTopic = dailyOrder[topicIndex];
-
-  document.getElementById("weekly-topic").innerText = `Weekly Topic Area: ${weeklyTopic}`;
-
-  // --- FALLBACK GENERATION FUNCTION ---
-  function generateFallback(topic, topicArea) {
-    // Simple explanation generator
-    let explanation = `“${topic}” is an important concept in the area of ${topicArea}. 
-    In simple terms, it refers to a key idea or approach that debaters might encounter. 
-    Knowing the basics of ${topic} can help you understand arguments and examples that often appear in discussions about ${topicArea}. 
-    Typically, you’ll see ${topic} come up when people discuss related issues or argue about policies and principles. If you’re new to it, start by learning what the term means, a few real-world examples, and why it matters in debates.`;
-
-    // Simple examples generator
-    let examples = [
-      `A common debate example for ${topic} might be a news headline or a real-world event that shows the concept in action.`,
-      `You might see ${topic} mentioned in debates about recent controversies or policy decisions.`
-    ];
-    // Argument tips
-    let argue = [
-      `If you're arguing for ${topic}, highlight its strengths and why it matters for ${topicArea}.`,
-      `If you're arguing against, point out any weaknesses or real-world challenges with ${topic}.`
-    ];
-    // Related topics
-    let related = [
-      `Basic principles of ${topicArea}`,
-      `Other key theories or frameworks in ${topicArea}`,
-      `Recent events or controversies involving ${topic}`
-    ];
-    return { explanation, examples, argue, related };
-  }
-
-  // --- RENDER ---
-  const data = topicData[dailyTopic] || generateFallback(dailyTopic, weeklyTopic);
-
-  function renderList(items) {
-    if (!items) return "";
-    return "<ul>" + items.map(x => `<li>${x}</li>`).join("") + "</ul>";
-  }
-
-  document.getElementById("daily-scroll").innerHTML = `
-    <div class="daily-title">${dailyTopic}</div>
-    <div class="explanation">${data.explanation}</div>
-    <div class="section-title">How it looks in real life</div>
-    <div class="examples">${renderList(data.examples)}</div>
-    <div class="section-title">How to Argue / Points to Consider</div>
-    <div class="argue">${renderList(data.argue)}</div>
-    <div class="section-title">Related Topics</div>
-    <div class="related">${renderList(data.related)}</div>
-  `;
-
-  // Optional: Automatic update at midnight (if embedded in a page open all day)
-  setInterval(function() {
-    let now = new Date();
-    if (now.getHours() === 0 && now.getMinutes() === 0) location.reload();
-  }, 60000); // Check every minute
-</script>
-
+    // Initial render
+    renderTopic();
+  </script>
 </body>
 </html>
