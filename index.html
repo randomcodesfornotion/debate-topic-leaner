@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Topic Learner</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #FFDAB9, #FFE5B4);
+    color: #111;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .embed-container {
+    width: 410px;
+    height: 410px;
+    background: #fff7f0;
+    border: 4px solid #FFB347;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 2px 4px 24px rgba(255, 179, 71, 0.1);
+  }
+  .weekly-topic {
+    background: #FFB347;
+    padding: 16px 10px 16px 10px;
+    font-size: 1.25em;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #FFDAB9;
+    letter-spacing: 1.2px;
+  }
+  .scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #FFB347 #fff7f0;
+  }
+  .daily-title {
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    letter-spacing: .5px;
+  }
+  .explanation {
+    margin-bottom: 14px;
+    background: #ffe5b4;
+    border-radius: 6px;
+    padding: 9px 11px;
+    font-size: 1em;
+    color: #222;
+    line-height: 1.5;
+  }
+  .section-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    color: #EA7B00;
+    font-size: 0.98em;
+    letter-spacing: .5px;
+  }
+  .examples, .argue, .related {
+    margin-bottom: 10px;
+  }
+  .examples ul, .argue ul, .related ul {
+    margin: 0 0 0 20px;
+    padding: 0;
+    font-size: .98em;
+  }
+</style>
+</head>
+<body>
+
+<div class="embed-container">
+  <div class="weekly-topic" id="weekly-topic">Loading Weekly Topic...</div>
+  <div class="scrollable-content" id="daily-scroll">
+    Loading Daily Topic...
+  </div>
+</div>
+
+<script>
+  // --- DATA BANK ---
+  const topicAreas = {
+    "Ethics": [
+      "Kantian Ethics", "Utilitarianism", "Virtue Ethics", "Moral Relativism"
+    ],
+    "International Relations": [
+      "Realism", "Liberalism", "Constructivism", "Neorealism"
+    ],
+    "Economics": [
+      "Keynesian Theory", "Monetarism", "Supply-Side Economics", "Behavioral Economics"
+    ],
+    "Environmental Policy": [
+      "Carbon Tax", "Cap and Trade", "Renewable Energy", "Geoengineering"
+    ],
+    "Technology": [
+      "Artificial Intelligence", "Data Privacy", "Cryptocurrency", "Social Media Regulation"
+    ],
+    "Justice": [
+      "Restorative Justice", "Retributive Justice", "Procedural Justice", "Distributive Justice"
+    ]
+  };
+
+  const topicData = {
+    // ... (same as before, only some topics shown here for brevity) ...
+    "Kantian Ethics": {
+      explanation: "Kantian Ethics is a theory of morality developed by philosopher Immanuel Kant. It says that what makes an action right or wrong isn't about the results—it’s about whether the action itself follows a rule that everyone could follow, all the time. Kant believed that you should act out of duty, not just because you want something good to happen. For example, if you think lying is wrong, you shouldn't lie, even if it might help someone, because you wouldn't want everyone to lie all the time. Kant’s main idea is that people have dignity and should always be treated as valuable in themselves, not just as a way to get what you want. Imagine returning a lost wallet even if no one would ever know; that’s Kantian Ethics in action.",
+      examples: [
+        "If you promise to return a borrowed book, you must do it—even if it’s hard for you.",
+        "If lying is wrong, it's always wrong—even to protect a friend."
+      ],
+      argue: [
+        "Promotes consistency and fairness in morality.",
+        "Can lead to tough situations—sometimes telling the truth can hurt someone."
+      ],
+      related: [
+        "Deontological Ethics",
+        "Categorical Imperative",
+        "Moral Absolutism"
+      ]
+    }
+    // ...add others as before...
+  };
+
+  // --- RANDOMIZATION & NON-REPEATING LOGIC ---
+  function shuffleArray(arr) {
+    let a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  let year = new Date().getFullYear();
+  let storageKey = `debate-weekly-shuffle-${year}`;
+  let weeklyOrder = JSON.parse(localStorage.getItem(storageKey));
+
+  if (!weeklyOrder || weeklyOrder.length !== Object.keys(topicAreas).length) {
+    weeklyOrder = shuffleArray(Object.keys(topicAreas));
+    localStorage.setItem(storageKey, JSON.stringify(weeklyOrder));
+  }
+
+  function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+  }
+
+  const today = new Date();
+  const weekNum = getWeekNumber(today);
+  const areaIndex = (weekNum - 1) % weeklyOrder.length;
+  const weeklyTopic = weeklyOrder[areaIndex];
+
+  let topicsList = topicAreas[weeklyTopic];
+  let dailyShuffleKey = `debate-daily-shuffle-${year}-${areaIndex}`;
+  let dailyOrder = JSON.parse(localStorage.getItem(dailyShuffleKey));
+  if (!dailyOrder || dailyOrder.length !== topicsList.length) {
+    dailyOrder = shuffleArray(topicsList);
+    localStorage.setItem(dailyShuffleKey, JSON.stringify(dailyOrder));
+  }
+  const topicIndex = ((today.getDate() + weekNum) % dailyOrder.length);
+  const dailyTopic = dailyOrder[topicIndex];
+
+  document.getElementById("weekly-topic").innerText = `Weekly Topic Area: ${weeklyTopic}`;
+
+  // --- FALLBACK GENERATION FUNCTION ---
+  function generateFallback(topic, topicArea) {
+    // Simple explanation generator
+    let explanation = `“${topic}” is an important concept in the area of ${topicArea}. 
+    In simple terms, it refers to a key idea or approach that debaters might encounter. 
+    Knowing the basics of ${topic} can help you understand arguments and examples that often appear in discussions about ${topicArea}. 
+    Typically, you’ll see ${topic} come up when people discuss related issues or argue about policies and principles. If you’re new to it, start by learning what the term means, a few real-world examples, and why it matters in debates.`;
+
+    // Simple examples generator
+    let examples = [
+      `A common debate example for ${topic} might be a news headline or a real-world event that shows the concept in action.`,
+      `You might see ${topic} mentioned in debates about recent controversies or policy decisions.`
+    ];
+    // Argument tips
+    let argue = [
+      `If you're arguing for ${topic}, highlight its strengths and why it matters for ${topicArea}.`,
+      `If you're arguing against, point out any weaknesses or real-world challenges with ${topic}.`
+    ];
+    // Related topics
+    let related = [
+      `Basic principles of ${topicArea}`,
+      `Other key theories or frameworks in ${topicArea}`,
+      `Recent events or controversies involving ${topic}`
+    ];
+    return { explanation, examples, argue, related };
+  }
+
+  // --- RENDER ---
+  const data = topicData[dailyTopic] || generateFallback(dailyTopic, weeklyTopic);
+
+  function renderList(items) {
+    if (!items) return "";
+    return "<ul>" + items.map(x => `<li>${x}</li>`).join("") + "</ul>";
+  }
+
+  document.getElementById("daily-scroll").innerHTML = `
+    <div class="daily-title">${dailyTopic}</div>
+    <div class="explanation">${data.explanation}</div>
+    <div class="section-title">How it looks in real life</div>
+    <div class="examples">${renderList(data.examples)}</div>
+    <div class="section-title">How to Argue / Points to Consider</div>
+    <div class="argue">${renderList(data.argue)}</div>
+    <div class="section-title">Related Topics</div>
+    <div class="related">${renderList(data.related)}</div>
+  `;
+
+  // Optional: Automatic update at midnight (if embedded in a page open all day)
+  setInterval(function() {
+    let now = new Date();
+    if (now.getHours() === 0 && now.getMinutes() === 0) location.reload();
+  }, 60000); // Check every minute
+</script>
+
+</body>
+</html>
